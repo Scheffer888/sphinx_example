@@ -7,6 +7,7 @@ sys.path.insert(1, "./src/")
 import shutil
 
 from settings import config
+import shlex
 
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
@@ -18,18 +19,18 @@ OS_TYPE = config("OS_TYPE")
 ## Helper functions for automatic execution of Jupyter notebooks
 environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
 def jupyter_execute_notebook(notebook):
-    return f"jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --log-level WARN --inplace ./src/{notebook}.ipynb"
+    return f'jupyter nbconvert --execute --to notebook --ClearMetadataPreprocessor.enabled=True --log-level WARN --inplace "{shlex.quote(f"./src/{notebook}.ipynb")}"'
 def jupyter_to_html(notebook, output_dir=OUTPUT_DIR):
-    return f"jupyter nbconvert --to html --log-level WARN --output-dir={output_dir} ./src/{notebook}.ipynb"
+    return f'jupyter nbconvert --to html --log-level WARN --output-dir="{shlex.quote(str(output_dir))}" "{shlex.quote(f"./src/{notebook}.ipynb")}"'
 def jupyter_to_md(notebook, output_dir=OUTPUT_DIR):
     """Requires jupytext"""
-    return f"jupytext --to markdown --log-level WARN --output-dir={output_dir} ./src/{notebook}.ipynb"
+    return f'jupytext --to markdown --log-level WARN --output-dir="{shlex.quote(str(output_dir))}" "{shlex.quote(f"./src/{notebook}.ipynb")}"'
 def jupyter_to_python(notebook, build_dir):
     """Convert a notebook to a python script"""
-    return f"jupyter nbconvert --log-level WARN --to python ./src/{notebook}.ipynb --output _{notebook}.py --output-dir {build_dir}"
+    return f'jupyter nbconvert --log-level WARN --to python "{shlex.quote(f"./src/{notebook}.ipynb")}" --output "_{notebook}.py" --output-dir "{shlex.quote(str(build_dir))}"'
 def jupyter_clear_output(notebook):
-    return f"jupyter nbconvert --log-level WARN --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace ./src/{notebook}.ipynb"
-# fmt: on
+    return f'jupyter nbconvert --log-level WARN --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace "{shlex.quote(f"./src/{notebook}.ipynb")}"'
+    # fmt: on
 
 
 def copy_file(origin_path, destination_path, mkdir=True):
